@@ -13,7 +13,7 @@ import Hero from '../../components/Hero/Hero';
 const Home = (props) => {
   return (
     <div className='container'>
-      <Layout noHeader>
+      <Layout>
         <Hero number={1054}/>
         <Container>
           <Box sx={{ my: 2 }}>

@@ -72,16 +72,29 @@ export const themeconfig = createTheme({
   palette: {
     type: 'light',
     primary: {
-      main: '#55917F',
-      light: 'rgb(119, 167, 152)',
-      dark: 'rgb(59, 101, 88)',
-      contrastText: '#fff',
+      main: '#ffb74d',
+      contrastText: 'white'
     },
     secondary: {
-      main: '#5E4C5A',
-      light: 'rgb(126, 111, 123)',
-      dark: 'rgb(65, 53, 62)',
-      contrastText: '#fff',
+      main: '#00acc1',
+      contrastText: 'white'
+    },
+    error: {
+      main: '#ff1744',
+    },
+    warning: {
+      main: '#ffd740',
+      light: '#FDE47A',
+      dark: '#AA6A00',
+    },
+    info: {
+      main: '#64b6e2',
+      light: '#cee6f4',
+      dark: '#1a86c0',
+    },
+    success: {
+      main: '#76ff03',
+      contrastText: 'rgba(255,255,255,0.87)',
     },
     accent1: {
       light: accent1,
@@ -101,41 +114,11 @@ export const themeconfig = createTheme({
       dark: accent3dark,
       contrastText: "#fff"
     },
-    error: {
-      main: '#EF4056',
-      dark: '#A6061B',
-      light: '#EF4056',
-      contrastText: 'rgba(255,255,255,0.87)',
-    },
-    warning: {
-      main: '#F5A623',
-      light: '#FDE47A',
-      dark: '#AA6A00',
-      contrastText: 'rgba(255,255,255,0.87)',
-    },
-    info: {
-      main: '#64b6e2',
-      light: '#cee6f4',
-      dark: '#1a86c0',
-      contrastText: 'rgba(255,255,255,0.87)',
-    },
-    success: {
-      main: '#2DBE60',
-      light: '#BDE8C7',
-      dark: '#00912D',
-      contrastText: 'rgba(255,255,255,0.87)',
-    },
     neutral: {
       light: neutral500,
       main: neutral700,
       dark: neutral900,
       contrastText: "#fff"
-    },
-    containedNeutral: {
-      light: 'rgba(255,255,255,0)', //transparent
-      main: 'rgba(255,255,255,0)', //transparent
-      dark: 'rgba(255,255,255,0)', //transparent
-      contrastText: "#000000" //white
     },
   },
   typography: {

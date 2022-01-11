@@ -1,14 +1,25 @@
-
-
-.hero {
+.hero-container {
   display: flex;
+  height: 100vh;
   align-items: center;
   justify-content: center;
-  // width: 99vw;
-  // max-width: 100vw;
+}
+
+.background {
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100vh;
-  // overflow-x: hidden !important;
-  background: rgb(255,231,67);
-  background: radial-gradient(circle, rgba(255,231,67,1) 0%, rgba(218,175,43,1) 100%);
-  user-select: none;
+  filter: brightness(50%);
+}
+
+.big-title {
+  text-shadow: 2px 3px 7px rgba(0, 0, 0, 0.623);
+  color: rgb(255, 231, 195);
+  z-index: 2;
+  // background: -webkit-linear-gradient( rgb(255, 255, 255), rgb(250, 244, 195));
+  // -webkit-background-clip: text;
+  // -webkit-text-fill-color: transparent;
 }

@@ -9,6 +9,8 @@ import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Zoom from '@mui/material/Zoom';
+import MenuIcon from '@mui/icons-material/Menu';
+import IconButton from '@mui/material/IconButton';
 
 function ScrollTop(props) {
   const { children, window } = props;
@@ -60,10 +62,13 @@ export default function Navbar(props) {
   return (
     <React.Fragment>
       <CssBaseline />
-      <AppBar>
+      <AppBar style={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
         <Toolbar>
+          <IconButton color='primary'>
+            <MenuIcon />
+          </IconButton>
           <Typography variant="h6" component="div">
-            Scroll to see button
+            Menu
           </Typography>
         </Toolbar>
       </AppBar>
