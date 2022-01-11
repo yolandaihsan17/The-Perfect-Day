@@ -1,0 +1,116 @@
+@import "./cssreset.scss";
+//INDEX.SCSS
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import "./variables.scss";
+
+body {
+  font-family: "Inter", sans-serif;
+  background-color: $neutral-canvas;
+  font-size: 17px;
+}
+
+h1 {
+  font-size: 3rem;
+}
+
+h2 {
+  font-size: 2.65rem;
+}
+
+h3 {
+  font-size: 2.12rem;
+}
+
+h4 {
+  font-size: 2rem;
+}
+
+h5 {
+  font-size: 1.75rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-weight: 500;
+}
+.underline {
+  text-decoration: underline;
+}
+
+.bold {
+  font-weight: bold !important;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.bold {
+  font-weight: 700 !important;
+}
+
+.extra-bold {
+  font-weight: 800 !important;
+}
+
+.text-green {
+  color: $success-normal !important;
+}
+
+.text-blue {
+  color: $accent-1 !important;
+}
+
+.text-red {
+  color: $error-normal !important;
+}
+
+.text-orange {
+  color: $warning-normal !important;
+}
+
+.align-center {
+  text-align: center;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.align-left {
+  text-align: left;
+}
+
+.align-center,
+.align-left,
+.align-right {
+  width: 100%;
+}
+
+.justify {
+  text-align: justify;
+}
+
+.small-text {
+  font-size: 10px;
+}
+
+input[type="number"] {
+  text-align: center;
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.global-container {
+  height: 100vh;
+  width: 100vw;
+  background-color: $neutral-canvas;
+}
