@@ -1,9 +1,9 @@
 import React from 'react'
-// import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import Layout from '../../template/Layout/Layout'
 // import { Stack } from '@mui/material'
 import './Home.scss'
-// import { Button } from '@mui/material'
+import { Button } from '@mui/material'
 
 import Container from '@mui/material/Container';
 import { Box } from '@mui/material';
@@ -16,6 +16,7 @@ const Home = (props) => {
       <Layout>
         <Hero number={1054}/>
         <Container>
+          <Button component={Link} to='/signup'>Sign Up</Button>
           <Box sx={{ my: 2 }}>
             {[...new Array(40)]
               .map(

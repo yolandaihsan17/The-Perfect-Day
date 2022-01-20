@@ -2,10 +2,10 @@ import { createTheme } from '@mui/material/styles'
 
 //IF YOU WANT TO USE THESE VARIABLES IN THE FUTURE, JUST UNCOMMENT IT
 
-const primary50 = 'bbd3cc'
+const primary50 = '#bbd3cc'
 // const primary200 = '99bdb2'
 // const primary300 = '77a799'
-const primary400 = '55917f'
+const primary400 = '#55917f'
 // const primary500 = '447466'
 // const primary600 = '33574c'
 // const primary700 = '223a33'
@@ -210,21 +210,22 @@ export const themeconfig = createTheme({
           '.MuiInputBase-root': { //For textfield without Status class (e.g: warning, error, success)
             borderRadius: radiusregular,
             backgroundColor: 'white',
-            padding: '0px 0px 0px 8px',
+            padding: '0px 0px 0px 0px',
+            outline: '1px solid ' + primary400,
             '.MuiInputBase-input': {
               height: '40px',
-              padding: '0px 12px'
+              padding: '0px 12px',
             },
             'textarea': {
               margin: '8px 0px',
               padding: '8px',
-              minHeight: '50px'
+              minHeight: '50px',
             },
             '&.Mui-disabled': {
               backgroundColor: neutral300,
             },
             '&.Mui-focused': {
-              outline: '2px solid ' + neutral300,
+              outline: '2px solid ' + primary400,
             },
             'fieldset': {
               border: 'none'

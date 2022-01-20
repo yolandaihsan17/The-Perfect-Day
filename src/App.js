@@ -6,6 +6,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { themeconfig } from './assets/themeConfig';
 
 const Home = lazy(() => import('./pages/Home/Home'))
+const Signup = lazy(() => import('./pages/Signup/Signup'))
 
 const theme = themeconfig
 
@@ -18,6 +19,7 @@ function App() {
             <Routes>
               <Route>
                 <Route exact path='/' element={<Home />} />
+                <Route exact path='/signup' element={<Signup />} />
               </Route>
             </Routes>
           </Suspense>
