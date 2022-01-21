@@ -7,6 +7,7 @@ import { themeconfig } from './assets/themeConfig';
 
 const Home = lazy(() => import('./pages/Home/Home'))
 const Signup = lazy(() => import('./pages/Signup/Signup'))
+const SelectTemplate = lazy(() => import('./pages/SelectTemplate/SelectTemplate'))
 
 const theme = themeconfig
 
@@ -20,6 +21,7 @@ function App() {
               <Route>
                 <Route exact path='/' element={<Home />} />
                 <Route exact path='/signup' element={<Signup />} />
+                <Route exact path='/select-template' element={<SelectTemplate />} />
               </Route>
             </Routes>
           </Suspense>

@@ -17,6 +17,7 @@ const Home = (props) => {
         <Hero number={1054}/>
         <Container>
           <Button component={Link} to='/signup'>Sign Up</Button>
+          <Button component={Link} to='/select-template'>Select Template</Button>
           <Box sx={{ my: 2 }}>
             {[...new Array(40)]
               .map(
