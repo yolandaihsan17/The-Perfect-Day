@@ -1,0 +1,29 @@
+@import "../../assets/variables.scss";
+
+.card {
+    box-shadow: $shadow-medium;
+    width: 250px;
+    min-height: 500px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.5s ease-in-out;
+}
+
+.bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    // border-radius: 20px;
+    transition: all 0.3s ease-in-out;
+}
+
+.card:hover .bg-image{
+    filter: brightness(50%);
+    transform: scale(1.1);
+}

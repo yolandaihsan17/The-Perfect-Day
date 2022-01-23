@@ -62,9 +62,9 @@ export default function Navbar(props) {
   return (
     <React.Fragment>
       <CssBaseline />
-      <AppBar style={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
+      <AppBar style={{ boxShadow: 'none' }}>
         <Toolbar>
-          <IconButton color='primary'>
+          <IconButton>
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div">

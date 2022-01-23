@@ -370,13 +370,13 @@ export const themeconfig = createTheme({
           paddingBottom: 8,
           '.MuiCardActions-root' : {
             // backgroundColor: 'red',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-            alignItems: 'stretch',
-            '>:not(:first-of-type)': { //remove margins for second button in card
-              margin: '0'
-            }
+            // display: 'flex',
+            // flexDirection: 'column',
+            // gap: '12px',
+            // alignItems: 'stretch',
+            // '>:not(:first-of-type)': { //remove margins for second button in card
+            //   margin: '0'
+            // }
           }
         }
       }

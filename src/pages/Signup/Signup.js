@@ -29,9 +29,6 @@ function Copyright(props) {
 
 export default function Signup() {
 
-    Parse.initialize('SvhdRkRZe1nabVjD1Mx4E1BgGQsyZ9rGibPrdAol', 'sZ4q0hWnXjK0SHC5EqCdroZqHW5JxSTquP55c49v')
-    Parse.serverURL = 'https://parseapi.back4app.com/'
-
     const [inProgress, setInProgress] = React.useState(false)
 
     const handleSubmit = (event) => {
