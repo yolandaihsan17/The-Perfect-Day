@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css2?family=Lateef&family=Rancho&display=swap");
+
+.opening {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.names-container {
+  padding: 16px;
+  margin-bottom: 32px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 3px 5px 8px #141414c2;
+  z-index: 2;
+  text-align: center;
+}
+
+.vignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.363);
+}
+
+.wedding-detail {
+  background: white;
+  margin: 32px 16px;
+  padding: 0px 16px;
+}
+
+.schedule-container {
+  width: 40%;
+  min-width: 300px;
+  margin-top: 32px;
+}
+
+
+.address {
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.place {
+  font-size: 1rem;
+}
+
+.date {
+  font-weight: bold;
+}
+
+.lateef {
+  font-family: "Lateef", cursive;
+  letter-spacing: 1px;
+}
+
+.rancho {
+  font-family: "Rancho", cursive;
+}
+
+@media (max-width: 1024px) {
+  .person-container {
+    width: 100%;
+  }
+
+  .schedule-container {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .address {
+    text-align: center;
+  }
+
+
+  .in-desktop {
+    display: none;
+  }
+}

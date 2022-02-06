@@ -1,12 +1,17 @@
 @import "./cssreset.scss";
 //INDEX.SCSS
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 @import "./variables.scss";
 
 body {
   font-family: "Inter", sans-serif;
-  background-color: $neutral-canvas;
+  background-color: white;
   font-size: 17px;
+}
+
+html {
+  overflow-x: hidden;
 }
 
 h1 {
@@ -72,6 +77,10 @@ h5 {
   color: $warning-normal !important;
 }
 
+.text-white {
+  color: white !important;
+}
+
 .align-center {
   text-align: center;
 }
@@ -113,4 +122,15 @@ input[type="number"]::-webkit-outer-spin-button {
   height: 100vh;
   width: 100vw;
   background-color: $neutral-canvas;
+}
+
+.cursive-1 {
+  font-family: 'Great Vibes', cursive !important;
+}
+
+
+@media (max-width: 1024px) {
+  .in-desktop {
+    display: none;
+  }
 }

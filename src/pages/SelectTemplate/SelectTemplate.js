@@ -93,8 +93,7 @@ export default function SelectTemplate() {
                                         </Typography>
                                     </CardContent>
                                     <CardActions>
-                                        <Button size="small">View</Button>
-                                        <Button size="small">Edit</Button>
+                                        <Button size="small">Pakai Template ini</Button>
                                     </CardActions>
                                 </Card>
                             </Grid>

@@ -11,6 +11,7 @@ const Signup = lazy(() => import('./pages/Signup/Signup'))
 const Login = lazy(() => import('./pages/Login/Login'))
 const UserDashboard = lazy(() => import('./pages/UserDashboard/UserDashboard'))
 const SelectTemplate = lazy(() => import('./pages/SelectTemplate/SelectTemplate'))
+const Template1 = lazy(() => import('./template/Wedding/Template1/Template1'))
 
 const theme = themeconfig
 
@@ -31,6 +32,7 @@ function App() {
                 <Route exact path='/login' element={<Login />} />
                 <Route exact path='/user-dashboard' element={<UserDashboard />} />
                 <Route exact path='/select-template' element={<SelectTemplate />} />
+                <Route exact path='/:mode/template1' element={<Template1 />} />
               </Route>
             </Routes>
           </Suspense>

@@ -13,6 +13,10 @@ import Parse from 'parse'
 
 const Home = (props) => {
 
+  React.useEffect(() => {
+    checkLogin()
+  },[])
+
   function checkLogin() {
     const isLoggedIn = Parse.User.current()
     console.log(isLoggedIn)
