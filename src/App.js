@@ -32,7 +32,8 @@ function App() {
                 <Route exact path='/login' element={<Login />} />
                 <Route exact path='/user-dashboard' element={<UserDashboard />} />
                 <Route exact path='/select-template' element={<SelectTemplate />} />
-                <Route exact path='/:mode/template1' element={<Template1 />} />
+                <Route exact path='/view/:invId' element={<Template1 editMode={false}/>} />
+                <Route exact path='/edit/:invId' element={<Template1 editMode={true}/>} />
               </Route>
             </Routes>
           </Suspense>

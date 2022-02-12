@@ -72,11 +72,11 @@ export const themeconfig = createTheme({
   palette: {
     type: 'light',
     primary: {
-      main: '#ffb74d',
+      main: primary400,
       contrastText: 'white'
     },
     secondary: {
-      main: '#00acc1',
+      main: '#fff',
       contrastText: 'white'
     },
     error: {
@@ -315,6 +315,9 @@ export const themeconfig = createTheme({
     }, MuiIconButton: {
       styleOverrides: {
         root: {
+          '&:hover':{
+            backgroundColor: 'black'
+          }
           // color: neutral700
         }
       }
