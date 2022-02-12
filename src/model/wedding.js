@@ -13,6 +13,7 @@ export function getTemplateModel() {
     descriptionText1: 'Anak ke 1 dari Bapak Fulan & Ibu Fulanah',
     descriptionText2: 'Anak ke 3 dari Bapak Abdul & Ibu Abdul',
     backgroundImage: '',
+    userId: '',
 
     // To be sent to parse
     parseBgImage: null,

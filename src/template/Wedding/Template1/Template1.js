@@ -46,19 +46,36 @@ const Template1 = (props) => {
 
   React.useEffect(() => {
     getInvitationData()
-    console.log(state)
   }, [])
 
+  // React.useEffect(()=> {
+  //   checkUser()
+  // }, [state.userId])
 
-  function getInvitationData() {
-    (async () => {
-      const wedding = Parse.Object.extend('wedding');
-      const query = new Parse.Query(wedding);
-      query.equalTo('objectId', invId);
-      // You can also query by using a parameter of an object
-      // query.equalTo('objectId', 'xKue915KBG');
-      try {
-        const results = await query.find();
+  function checkUser(invitationUserId) {
+    console.log('a', currentUser.id, invitationUserId)
+    if (currentUser.id != invitationUserId) {
+      console.log('not same', currentUser.id, invitationUserId)
+      return false
+    } else {
+      console.log('nice', currentUser.id, invitationUserId)
+      return true
+    }
+  }
+
+
+  async function getInvitationData() {
+    const wedding = Parse.Object.extend('wedding');
+    const query = new Parse.Query(wedding);
+    query.equalTo('objectId', invId);
+    // You can also query by using a parameter of an object
+    // query.equalTo('objectId', 'xKue915KBG');
+    try {
+      const results = await query.find();
+      const userId = results[0].get('userId')
+      const isSameUser = checkUser(userId)
+
+      if (isSameUser) {
         for (const object of results) {
           setState({
             welcomeWords: object.get('welcomeWords'),
@@ -68,15 +85,25 @@ const Template1 = (props) => {
             section1Title: object.get('section1Title'),
             descriptionText1: object.get('descriptionText1'),
             descriptionText2: object.get('descriptionText2'),
-            backgroundImage: object.get('backgroundImage')._url, 
-            events: object.get('events')
+            backgroundImage: object.get('backgroundImage')._url,
+            events: object.get('events'),
+            userId: object.get('userId')
           })
         }
-      } catch (error) {
-        console.error('Error while fetching wedding', error);
+      } else {
+        console.log('redirecting')
       }
-    })();
+
+
+    } catch (error) {
+      console.error('Error while fetching wedding', error);
+    }
   }
+
+
+
+
+
 
   const templateEvent = {
     name: 'New Event',
