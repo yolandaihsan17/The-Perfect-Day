@@ -9,12 +9,22 @@ export function getTemplateModel() {
     parentB1: 'parent 3',
     parentB2: 'parent 4',
     mainDate: '2021-02-13T01:49:29+01:00',
-    section1Title: 'Assalamualaikum Warahmatullahi Wabarakatuh',
+    section1Title: 'Wedding Details',
     descriptionText1: 'Anak ke 1 dari Bapak Fulan & Ibu Fulanah',
     descriptionText2: 'Anak ke 3 dari Bapak Abdul & Ibu Abdul',
-    backgroundImage: '',
     userId: '',
 
+    pictureProfileA: '',
+    pictureProfileB: '',
+
+    pictureProfileAName: '',
+    pictureProfileBName: '',
+    
+    ppA: '',
+    ppB: '',
+
+
+    backgroundImage: '',
     // To be sent to parse
     parseBgImage: null,
     parseBgImageName: '',

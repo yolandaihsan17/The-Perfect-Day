@@ -87,23 +87,18 @@ const Template1 = (props) => {
             descriptionText2: object.get('descriptionText2'),
             backgroundImage: object.get('backgroundImage')._url,
             events: object.get('events'),
-            userId: object.get('userId')
+            userId: object.get('userId'),
+            ppA: object.get('profile1')._url,
+            ppB: object.get('profile2')._url
           })
         }
       } else {
         console.log('redirecting')
       }
-
-
     } catch (error) {
       console.error('Error while fetching wedding', error);
     }
   }
-
-
-
-
-
 
   const templateEvent = {
     name: 'New Event',
@@ -146,7 +141,6 @@ const Template1 = (props) => {
   }
 
   const handleClose = (resp) => {
-    console.log(resp)
     setOpen(false);
   };
 
@@ -200,6 +194,36 @@ const Template1 = (props) => {
     }
   }
 
+  function changeAvatar(event, target) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    const url = reader.readAsDataURL(file);
+
+    reader.onloadend = (e) => {
+      if (target == 'a') {
+        setState(prev => {
+          const image = reader.result
+          return {
+            ...prev,
+            ppA: image,
+            pictureProfileA: file,
+            pictureProfileAName: `${currentUser.id}-ppA-${file.name}`
+          }
+        })
+      } else {
+        setState(prev => {
+          const image = reader.result
+          return {
+            ...prev,
+            ppB: image,
+            pictureProfileB: file,
+            pictureProfileBName: `${currentUser.id}-ppB-${file.name}`
+          }
+        })
+      }
+    }
+  }
+
 
   //PARSE FUNCTIONS
   function save() {
@@ -215,8 +239,9 @@ const Template1 = (props) => {
       wedding.set('descriptionText2', state.descriptionText2);
       wedding.set('section1Title', state.section1Title);
       wedding.set('events', state.events);
-      console.log('before sending', state.parseBgImage)
       wedding.set('backgroundImage', new Parse.File(state.parseBgImageName, state.parseBgImage));
+      wedding.set('profile1', new Parse.File(state.pictureProfileAName, state.pictureProfileA));
+      wedding.set('profile2', new Parse.File(state.pictureProfileBName, state.pictureProfileB));
       try {
         const result = await wedding.save();
         // Access the Parse Object attributes using the .GET method
@@ -293,7 +318,13 @@ const Template1 = (props) => {
 
         <Stack flexWrap={'wrap'} gap={6} alignItems={'center'} justifyContent={'space-evenly'} direction={'row'} sx={{ width: '100%', marginTop: '32px' }}>
           <Stack gap={1} alignItems={'center'} justifyContent={'center'} direction={'column'} className='person-container'>
-            <Avatar sx={{ width: 100, height: 100 }}>H</Avatar>
+            <Avatar sx={{ width: 100, height: 100 }} alt={state.name1} src={state.ppA}></Avatar>
+            <label htmlFor="ppA">
+              <Input accept="image/*" id="ppA" type="file" onChange={(e) => changeAvatar(e, 'a')} />
+              <IconButton color="primary" variant="contained" aria-label="upload picture" component="span" style={{ fontSize: '2rem' }}>
+                <PhotoCamera />
+              </IconButton>
+            </label>
             <div className='item-container'>
               <Typography variant='h3' className='rancho'>{state.name1}</Typography>
               {isEditMode &&
@@ -313,7 +344,13 @@ const Template1 = (props) => {
           </Stack>
           <Typography variant='h2' className='person-container rancho' sx={{ textAlign: 'center' }}>&</Typography>
           <Stack gap={1} alignItems={'center'} justifyContent={'center'} direction={'column'} className='person-container'>
-            <Avatar sx={{ width: 100, height: 100 }}>H</Avatar>
+            <Avatar sx={{ width: 100, height: 100 }} alt={state.name2} src={state.ppB}></Avatar>
+            <label htmlFor="ppB">
+              <Input accept="image/*" id="ppB" type="file" onChange={(e) => changeAvatar(e, 'b')} />
+              <IconButton color="primary" variant="contained" aria-label="upload picture" component="span" style={{ fontSize: '2rem' }}>
+                <PhotoCamera />
+              </IconButton>
+            </label>
             <div className='item-container'>
               <Typography variant='h3' className='rancho'>{state.name2}</Typography>
               {isEditMode &&
