@@ -14,20 +14,20 @@ export function getTemplateModel() {
     descriptionText2: 'Anak ke 3 dari Bapak Abdul & Ibu Abdul',
     userId: '',
 
-    pictureProfileA: '',
-    pictureProfileB: '',
+    // pictureProfileA: '',
+    // pictureProfileB: '',
 
-    pictureProfileAName: '',
-    pictureProfileBName: '',
-    
+    // pictureProfileAName: '',
+    // pictureProfileBName: '',
+
     ppA: '',
     ppB: '',
 
 
-    backgroundImage: '',
+    // backgroundImage: '',
     // To be sent to parse
     parseBgImage: null,
-    parseBgImageName: '',
+    // parseBgImageName: '',
 
     events: [{
       name: 'Event 1',

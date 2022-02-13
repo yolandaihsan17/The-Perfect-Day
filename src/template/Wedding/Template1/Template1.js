@@ -1,37 +1,30 @@
 import React from 'react'
-// import './Layout.scss'
-import { Stack } from '@mui/material'
-import { Typography } from '@mui/material'
-import './Template1.scss'
-
-import Avatar from '@mui/material/Avatar';
-// import PlaceIcon from '@mui/icons-material/Place';
-// import AccessTimeIcon from '@mui/icons-material/AccessTime';
-
-
-// import Box from '@mui/material/Box';
-import ImageList from '../../../components/ImageList/ImageList'
+import { useState, useEffect, useRef } from "react";
 import moment from 'moment';
-import { Button } from '@mui/material';
 import Parse from 'parse'
 import { useParams } from "react-router-dom";
+import Compressor from 'compressorjs';
 
-
+import Avatar from '@mui/material/Avatar';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import { styled } from '@mui/material/styles';
+import { Stack } from '@mui/material'
+import { Typography } from '@mui/material'
+import { Button } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-// import DialogContentText from '@mui/material/DialogContentText';
-// import DialogTitle from '@mui/material/DialogTitle';
 
+import ImageList from '../../../components/ImageList/ImageList'
 import EventForm from '../../../components/EventForm/EventForm';
-
-import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
-import PhotoCamera from '@mui/icons-material/PhotoCamera';
-// import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { styled } from '@mui/material/styles';
 import { getTemplateModel } from '../../../model/wedding';
+import { getTemplateEvent } from '../../../model/event-template';
+import compressImage from '../../../utils/compress-image';
+
+import './Template1.scss'
 
 const Input = styled('input')({
   display: 'none',
@@ -42,27 +35,41 @@ const Template1 = (props) => {
   const { invId } = useParams();
   const isEditMode = props.editMode
   const currentUser = Parse.User.current()
-  const [state, setState] = React.useState(getTemplateModel())
+  const [state, setState] = useState(getTemplateModel())
 
-  React.useEffect(() => {
+  const bgImgParse = useRef()
+  // const backgroundImageName = useRef('')
+
+  const ppAParse = useRef()
+  // const ppAName = useRef('')
+
+  const ppBParse = useRef()
+  // const ppBName = useRef('')
+
+
+
+  const templateEvent = getTemplateEvent()
+
+  // FORM functions
+  const [open, setOpen] = useState(false);
+  const [field, setField] = useState(<div>&nbsp;</div>)
+
+  useEffect(() => {
     getInvitationData()
   }, [])
 
-  // React.useEffect(()=> {
-  //   checkUser()
-  // }, [state.userId])
+  // useEffect(() => {
+  //   // getInvitationData()
+  //   console.log(state)
+  // }, [state])
 
   function checkUser(invitationUserId) {
-    console.log('a', currentUser.id, invitationUserId)
     if (currentUser.id != invitationUserId) {
-      console.log('not same', currentUser.id, invitationUserId)
       return false
     } else {
-      console.log('nice', currentUser.id, invitationUserId)
       return true
     }
   }
-
 
   async function getInvitationData() {
     const wedding = Parse.Object.extend('wedding');
@@ -99,20 +106,6 @@ const Template1 = (props) => {
       console.error('Error while fetching wedding', error);
     }
   }
-
-  const templateEvent = {
-    name: 'New Event',
-    place: 'New Event place',
-    address: 'New Event Address, No. 17, Indonesia',
-    startTime: '09.00',
-    endTime: '18.00',
-    date: '2021-02-13T01:49:29+01:00',
-    mapLink: 'https://goo.gl/maps/CZ24HgifWh2vjYp8A'
-  }
-
-  // FORM functions
-  const [open, setOpen] = React.useState(false);
-  const [field, setField] = React.useState(<div>&nbsp;</div>)
 
   const handleClickOpen = (field, type = 'text') => {
     setField(
@@ -176,19 +169,33 @@ const Template1 = (props) => {
     console.log(tempEvents)
   }
 
-  function setBackgroundImage(event) {
-    const file = event.target.files[0];
+
+  //IMAGE Zone
+  function readImage(event) {
+    let file = event.target.files[0];
+    // if more than 5MB, then compress it first
+    if (file.size > 5000000) {
+      compressImage(file).then(result => {
+        file = result
+        setBgImage(file)
+      })
+    } else {
+      setBgImage(file)
+    }
+  }
+
+  function setBgImage(file) {
     const reader = new FileReader();
     const url = reader.readAsDataURL(file);
 
+    bgImgParse.current = file
+
     reader.onloadend = (e) => {
+      const image = reader.result
       setState(prev => {
-        const image = reader.result
         return {
           ...prev,
           backgroundImage: image,
-          parseBgImage: file,
-          parseBgImageName: `${currentUser.id}-bg_image-${file.name}`
         }
       })
     }
@@ -200,24 +207,23 @@ const Template1 = (props) => {
     const url = reader.readAsDataURL(file);
 
     reader.onloadend = (e) => {
-      if (target == 'a') {
+      if (target === 'a') {
+        ppAParse.current = file
+
         setState(prev => {
           const image = reader.result
           return {
             ...prev,
             ppA: image,
-            pictureProfileA: file,
-            pictureProfileAName: `${currentUser.id}-ppA-${file.name}`
           }
         })
       } else {
+        ppBParse.current = file
         setState(prev => {
           const image = reader.result
           return {
             ...prev,
             ppB: image,
-            pictureProfileB: file,
-            pictureProfileBName: `${currentUser.id}-ppB-${file.name}`
           }
         })
       }
@@ -239,9 +245,9 @@ const Template1 = (props) => {
       wedding.set('descriptionText2', state.descriptionText2);
       wedding.set('section1Title', state.section1Title);
       wedding.set('events', state.events);
-      wedding.set('backgroundImage', new Parse.File(state.parseBgImageName, state.parseBgImage));
-      wedding.set('profile1', new Parse.File(state.pictureProfileAName, state.pictureProfileA));
-      wedding.set('profile2', new Parse.File(state.pictureProfileBName, state.pictureProfileB));
+      wedding.set('backgroundImage', new Parse.File('background-image', bgImgParse.current));
+      wedding.set('profile1', new Parse.File(`${currentUser.id}-profile-A-image`, ppAParse.current)); 
+      wedding.set('profile2', new Parse.File(`${currentUser.id}-profile-B-Image`, ppBParse.current));
       try {
         const result = await wedding.save();
         // Access the Parse Object attributes using the .GET method
@@ -260,7 +266,7 @@ const Template1 = (props) => {
 
         {isEditMode &&
           <label htmlFor="icon-button-file" style={{ position: 'absolute', top: '20px', right: '20px' }}>
-            <Input accept="image/*" id="icon-button-file" type="file" onChange={setBackgroundImage} />
+            <Input accept="image/*" id="icon-button-file" type="file" onChange={readImage} />
             <IconButton color="secondary" variant="contained" aria-label="upload picture" component="span" style={{ fontSize: '2rem' }}>
               <PhotoCamera />
             </IconButton>
