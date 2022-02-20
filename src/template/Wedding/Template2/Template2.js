@@ -22,18 +22,18 @@ import DialogContent from '@mui/material/DialogContent';
 
 import ImageList from '../../../components/ImageList/ImageList'
 import EventForm from '../../../components/EventForm/EventForm';
-import { getTemplateModel, ImageBBObject } from '../../../model/wedding';
+import { getTemplateModel } from '../../../model/wedding';
 import { getTemplateEvent } from '../../../model/event-template';
 import compressImage from '../../../utils/compress-image';
 
 
-import './Template1.scss'
+import './Template2.scss'
 
 const Input = styled('input')({
   display: 'none',
 });
 
-const Template1 = (props) => {
+const Template2 = (props) => {
   // console.log({children})
   const { invId } = useParams();
   const isEditMode = props.editMode
@@ -44,12 +44,8 @@ const Template1 = (props) => {
   const profilePictAFile = useRef()
   const profilePictBFile = useRef()
 
-  const templateEvent = getTemplateEvent()
 
-  const [profilePictA, setProfilePictA] = useState(ImageBBObject())
-  const [profilePictB, setProfilePictB] = useState(ImageBBObject())
-  const [backgroundImage, setBackgroundImage] = useState(ImageBBObject())
-  const [imagesArray, setImagesArray] = useState([])
+  const templateEvent = getTemplateEvent()
 
   // FORM functions
   const [open, setOpen] = useState(false);
@@ -61,8 +57,16 @@ const Template1 = (props) => {
 
   useEffect(() => {
     // getInvitationData()
-    console.log(imagesArray)
-  }, [imagesArray])
+    console.log(state)
+  }, [state])
+
+  function checkUser(invitationUserId) {
+    if (currentUser.id !== invitationUserId) {
+      return false
+    } else {
+      return true
+    }
+  }
 
   async function getInvitationData() {
     const wedding = Parse.Object.extend('wedding');
@@ -85,18 +89,13 @@ const Template1 = (props) => {
             section1Title: object.get('section1Title'),
             descriptionText1: object.get('descriptionText1'),
             descriptionText2: object.get('descriptionText2'),
-            // bgImage: object.get('bgImage'),
+            bgImage: object.get('bgImage'),
             events: object.get('events'),
             userId: object.get('userId'),
-            // ppA: object.get('profilePictA'),
-            // ppB: object.get('profilePictB'),
-            // images: object.get('images')
+            ppA: object.get('profilePictA'),
+            ppB: object.get('profilePictB'),
+            images: object.get('images')
           })
-
-          setProfilePictA(object.get('profilePictA'))
-          setProfilePictB(object.get('profilePictA'))
-          setBackgroundImage(object.get('bgImage'))
-          setImagesArray(object.get('images'))
         }
       } else {
         console.log('redirecting')
@@ -104,195 +103,6 @@ const Template1 = (props) => {
     } catch (error) {
       console.error('Error while fetching wedding', error);
     }
-  }
-
-  function checkUser(invitationUserId) {
-    if (currentUser.id !== invitationUserId) {
-      return false
-    } else {
-      return true
-    }
-  }
-  //IMAGE Zone
-  function readImage(event) {
-    let file = event.target.files[0];
-    // if more than 5MB, then compress it first
-    if (file.size > 5000000) {
-      compressImage(file).then(result => {
-        file = result
-        setBgImage(file)
-      })
-    } else {
-      setBgImage(file)
-    }
-  }
-
-  // let bgImage = useRef({})
-
-  function setBgImage(file) {
-    const reader = new FileReader();
-    const url = reader.readAsDataURL(file);
-
-    // bgImageFile.current = file
-
-    reader.onloadend = (e) => {
-      const image = reader.result
-      const resetPict = ImageBBObject()
-      setBackgroundImage({ ...resetPict, is_local: true, file_base64: image, title: file.filename, file: file })
-    }
-  }
-
-
-  // let profileA = useRef({}) //to upload to IMGBB, not base64
-  // let profileB = useRef({}) //to upload to IMGBB, not base64
-
-  function changeAvatar(event, target) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    const url = reader.readAsDataURL(file);
-
-    reader.onloadend = (e) => {
-      const image = reader.result
-      if (target === 'a') {
-        const resetPict = ImageBBObject()
-        setProfilePictA({ ...resetPict, is_local: true, file_base64: image, title: file.filename, file: file })
-      } else {
-        const resetPict = ImageBBObject()
-        setProfilePictB({ ...resetPict, is_local: true, file_base64: image, title: file.filename, file: file })
-      }
-    }
-  }
-
-  const filesLoaded = useRef(0)
-  const filesNew = useRef([])
-
-  function setImages(event) {
-    const files = event.target.files
-    let filesArray = []
-
-    const tempArray = []
-    for (let file of files) {
-
-      tempArray.push(file)
-
-      const reader = new FileReader();
-      const url = reader.readAsDataURL(file);
-
-      reader.onloadend = (e) => {
-        const image = reader.result
-        filesArray.push({ file_base64: image, title: file.name, is_local: true, file: file })
-        filesLoaded.current += 1
-
-        console.log(filesArray)
-
-        if (filesLoaded.current === files.length) {
-          filesLoaded.current = 0
-          setImagesArray(filesArray)
-        }
-      }
-    }
-
-    filesNew.current = tempArray
-  }
-
-  let uploadedImages = useRef([])
-
-  //PARSE FUNCTIONS
-  async function save() {
-
-    //Upload Avatar
-    const avatarA = await uploadImage(profilePictA.file)
-    // profileA.current = avatarA.data
-    setProfilePictA(avatarA.data)
-    console.log('avatar a Uploaded', avatarA.data)
-
-    const avatarB = await uploadImage(profilePictB.file)
-    // profileB.current = avatarB.data
-    setProfilePictB(avatarB.data)
-    console.log('avatar b Uploaded', avatarB.data)
-
-    const bgImg = await uploadImage(backgroundImage.file)
-    // bgImage.current = bgImg.data
-    setBackgroundImage(bgImg.data)
-    console.log('bg Image Uploaded', bgImg.data)
-
-
-    //Upload Images
-    let index = 0
-    let tempArray = []
-    for (let image of filesNew.current) {
-      const result = await uploadImage(image)
-      index++
-      tempArray.push(result.data)
-
-      // if all images uploaded
-      if (index === filesNew.current.length) {
-        setImagesArray(tempArray)
-        saveToParse()
-      }
-    }
-  }
-
-  async function saveToParse() {
-    const wedding = new Parse.Object('wedding');
-    wedding.set('userId', Parse.User.current().id);
-    wedding.set('orderDate', new Date());
-    wedding.set('templateName', 'template1');
-    wedding.set('welcomeWords', state.welcomeWords);
-    wedding.set('name1', state.name1);
-    wedding.set('name2', state.name2);
-    wedding.set('descriptionText1', state.descriptionText1);
-    wedding.set('descriptionText2', state.descriptionText2);
-    wedding.set('section1Title', state.section1Title);
-    wedding.set('events', state.events);
-    wedding.set('mainDate', state.mainDate);
-    wedding.set('profilePictA', profilePictA);
-    wedding.set('profilePictB', profilePictB);
-    wedding.set('bgImage', backgroundImage);
-    wedding.set('images', imagesArray)
-    try {
-      const result = await wedding.save();
-      // Access the Parse Object attributes using the .GET method
-      console.log('order created', result);
-    } catch (error) {
-      console.error('Error while creating order: ', error);
-    }
-  }
-
-  async function uploadImage(image) {
-    let body = new FormData()
-    body.set('key', 'd829fc600a8959409d9e433b97f87f32')
-    body.append('image', image)
-
-    const a = await axios({
-      method: 'post',
-      url: 'https://api.imgbb.com/1/upload',
-      data: body
-    })
-
-    return a.data
-  }
-
-
-  function deleteUploadedImage() {
-    return new Promise((resolve, reject) => {
-      let count = 0
-      for (let image of uploadedImages.current) {
-        axios({
-          method: 'post',
-          url: image.delete_url,
-          data: null
-        }).then(() => {
-          count += 1
-          if (count === uploadedImages.current.length) {
-            resolve()
-          }
-        }).catch(() => {
-          console.log('Failed to delete this image: ' + image.title)
-          reject()
-        })
-      }
-    })
   }
 
   const handleClickOpen = (field, type = 'text') => {
@@ -358,9 +168,210 @@ const Template1 = (props) => {
   }
 
 
+  //IMAGE Zone
+  function readImage(event) {
+    let file = event.target.files[0];
+    // if more than 5MB, then compress it first
+    if (file.size > 5000000) {
+      compressImage(file).then(result => {
+        file = result
+        setBgImage(file)
+      })
+    } else {
+      setBgImage(file)
+    }
+  }
+
+  function setBgImage(file) {
+    const reader = new FileReader();
+    const url = reader.readAsDataURL(file);
+
+    bgImageFile.current = file
+
+    reader.onloadend = (e) => {
+      const image = reader.result
+      setState(prev => {
+        return {
+          ...prev,
+          backgroundImage: image,
+        }
+      })
+    }
+  }
+
+  function changeAvatar(event, target) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    const url = reader.readAsDataURL(file);
+
+    reader.onloadend = (e) => {
+      if (target === 'a') {
+        profilePictAFile.current = file
+
+        setState(prev => {
+          const image = reader.result
+          return {
+            ...prev,
+            ppA: image,
+          }
+        })
+      } else {
+        profilePictBFile.current = file
+        setState(prev => {
+          const image = reader.result
+          return {
+            ...prev,
+            ppB: image,
+          }
+        })
+      }
+    }
+  }
+
+
+  const filesLoaded = useRef(0)
+  const filesNew = useRef([])
+
+  function setImages(event) {
+    const files = event.target.files
+    let filesArray = []
+
+
+    const tempArray = []
+    for (let file of files) {
+
+      tempArray.push(file)
+
+      const reader = new FileReader();
+      const url = reader.readAsDataURL(file);
+
+      reader.onloadend = (e) => {
+        const image = reader.result
+        filesArray.push({ img: image, title: file.name })
+        filesLoaded.current += 1
+
+        if (filesLoaded.current === files.length) {
+          filesLoaded.current = 0
+          setState(prev => {
+            return {
+              ...prev,
+              images: filesArray
+            }
+          })
+        }
+      }
+    }
+
+    filesNew.current = tempArray
+
+    // console.log('files array', filesArray, filesArray.length)
+
+  }
+
+
+  let uploadedImages = useRef([])
+
+  let profileA = useRef({})
+  let profileB = useRef({})
+  let bgImage = useRef({})
+
+  //PARSE FUNCTIONS
+  async function save() {
+
+    //Upload Avatar
+    const avatarA = await uploadImage(profilePictAFile.current)
+    profileA.current = avatarA.data
+    console.log('avatar a Uploaded', avatarA.data)
+
+    const avatarB = await uploadImage(profilePictBFile.current)
+    profileB.current = avatarB.data
+    console.log('avatar b Uploaded', avatarB.data)
+
+    const backgroundImage = await uploadImage(bgImageFile.current)
+    bgImage.current = backgroundImage.data
+    console.log('bg Image Uploaded', backgroundImage.data)
+
+
+    //Upload Images
+    let index = 0
+    let tempArray = []
+    for (let image of filesNew.current) {
+      const result = await uploadImage(image)
+      index++
+      tempArray.push(result.data)
+      uploadedImages.current = tempArray
+
+      // if all images uploaded
+      if (index === filesNew.current.length) saveToParse()
+    }
+  }
+
+
+  async function saveToParse() {
+    const wedding = new Parse.Object('wedding');
+    wedding.set('userId', Parse.User.current().id);
+    wedding.set('orderDate', new Date());
+    wedding.set('templateName', 'Template2');
+    wedding.set('welcomeWords', state.welcomeWords);
+    wedding.set('name1', state.name1);
+    wedding.set('name2', state.name2);
+    wedding.set('descriptionText1', state.descriptionText1);
+    wedding.set('descriptionText2', state.descriptionText2);
+    wedding.set('section1Title', state.section1Title);
+    wedding.set('events', state.events);
+    wedding.set('mainDate', state.mainDate);
+    wedding.set('profilePictA', profileA.current);
+    wedding.set('profilePictB', profileB.current);
+    wedding.set('bgImage', bgImage.current);
+    wedding.set('images', uploadedImages.current)
+    try {
+      const result = await wedding.save();
+      // Access the Parse Object attributes using the .GET method
+      console.log('order created', result);
+    } catch (error) {
+      console.error('Error while creating order: ', error);
+    }
+  }
+
+  async function uploadImage(image) {
+    let body = new FormData()
+    body.set('key', 'd829fc600a8959409d9e433b97f87f32')
+    body.append('image', image)
+
+    const a = await axios({
+      method: 'post',
+      url: 'https://api.imgbb.com/1/upload',
+      data: body
+    })
+
+    return a.data
+  }
+
+  function deleteUploadedImage() {
+    return new Promise((resolve, reject) => {
+      let count = 0
+      for (let image of uploadedImages.current) {
+        axios({
+          method: 'post',
+          url: image.delete_url,
+          data: null
+        }).then(() => {
+          count += 1
+          if (count === uploadedImages.current.length) {
+            resolve()
+          }
+        }).catch(() => {
+          console.log('Failed to delete this image: ' + image.title)
+          reject()
+        })
+      }
+    })
+  }
+
+
   return (
     <div>
-      <Stack gap={2} alignItems={'center'} justifyContent={'center'} direction={'column'} className='opening' sx={{ backgroundImage: `url(${backgroundImage.is_local ? backgroundImage.file_base64 : backgroundImage.url})` }}>
+      <Stack gap={2} alignItems={'center'} justifyContent={'center'} direction={'column'} className='opening' sx={{ backgroundImage: `url(${state.bgImage.url})` }}>
         <div className="vignette"></div>
 
         {isEditMode &&
@@ -423,7 +434,7 @@ const Template1 = (props) => {
 
         <Stack flexWrap={'wrap'} gap={6} alignItems={'center'} justifyContent={'space-evenly'} direction={'row'} sx={{ width: '100%', marginTop: '32px' }}>
           <Stack gap={1} alignItems={'center'} justifyContent={'center'} direction={'column'} className='person-container'>
-            <Avatar sx={{ width: 100, height: 100 }} alt={profilePictA.title} src={profilePictA.is_local ? profilePictA.file_base64 : profilePictA.url}></Avatar>
+            <Avatar sx={{ width: 100, height: 100 }} alt={state.name1} src={state.ppA.display_url}></Avatar>
             <label htmlFor="ppA">
               <Input accept="image/*" id="ppA" type="file" onChange={(e) => changeAvatar(e, 'a')} />
               <IconButton color="primary" variant="contained" aria-label="upload picture" component="span" style={{ fontSize: '2rem' }}>
@@ -449,7 +460,7 @@ const Template1 = (props) => {
           </Stack>
           <Typography variant='h2' className='person-container rancho' sx={{ textAlign: 'center' }}>&</Typography>
           <Stack gap={1} alignItems={'center'} justifyContent={'center'} direction={'column'} className='person-container'>
-            <Avatar sx={{ width: 100, height: 100 }} alt={profilePictB.title} src={profilePictB.is_local ? profilePictB.file_base64 : profilePictB.url}></Avatar>
+            <Avatar sx={{ width: 100, height: 100 }} alt={state.name2} src={state.ppB.display_url}></Avatar>
             <label htmlFor="ppB">
               <Input accept="image/*" id="ppB" type="file" onChange={(e) => changeAvatar(e, 'b')} />
               <IconButton color="primary" variant="contained" aria-label="upload picture" component="span" style={{ fontSize: '2rem' }}>
@@ -508,7 +519,7 @@ const Template1 = (props) => {
           </label>
         }
 
-        {imagesArray && <ImageList sx={{ margin: '32px auto' }} images={imagesArray} />}
+        {state.images && <ImageList sx={{ margin: '32px auto' }} images={state.images} />}
 
         <Button onClick={save}>
           Save
@@ -533,4 +544,4 @@ const Template1 = (props) => {
   )
 }
 
-export default Template1
+export default Template2

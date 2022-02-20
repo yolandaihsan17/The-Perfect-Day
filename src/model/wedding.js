@@ -14,20 +14,14 @@ export function getTemplateModel() {
     descriptionText2: 'Anak ke 3 dari Bapak Abdul & Ibu Abdul',
     userId: '',
 
-    // pictureProfileA: '',
-    // pictureProfileB: '',
+    ppA: ImageBBObject(),
+    ppB: ImageBBObject(),
+    
+    parseBgImage: ImageBBObject(),
 
-    // pictureProfileAName: '',
-    // pictureProfileBName: '',
+    bgImage: ImageBBObject(),
 
-    ppA: '',
-    ppB: '',
-
-
-    // backgroundImage: '',
-    // To be sent to parse
-    parseBgImage: null,
-    // parseBgImageName: '',
+    images: [ImageBBObject()],
 
     events: [{
       name: 'Event 1',
@@ -48,5 +42,38 @@ export function getTemplateModel() {
       mapLink: 'https://goo.gl/maps/CZ24HgifWh2vjYp8A'
     }
     ]
+  }
+}
+
+export function ImageBBObject() {
+  return {
+    delete_url: '',
+    display_url: '',
+    expiration: '',
+    id: '',
+    image: ImageObject(),
+    is_360: '',
+    medium: ImageObject(),
+    size: '',
+    thumb: ImageObject(),
+    time: '',
+    title: '',
+    url: '',
+    url_viewer: '',
+
+    // frontend field for local images
+    is_local: false,
+    file_base64: null,
+    file: null
+  }
+}
+
+export function ImageObject() {
+  return {
+    extension: '',
+    filename: '',
+    mime: '',
+    name: '',
+    url: ''
   }
 }

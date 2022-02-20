@@ -3,18 +3,22 @@ import Box from '@mui/material/Box';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 
-export default function MasonryImageList() {
+export default function MasonryImageList(props) {
   const screenSize = window.innerWidth
   const cols = screenSize <= 768 ? 1 : 3
   const variant = screenSize <= 768 ? '' : 'masonry'
+
+  const images = props.images
+
+  console.log('images', images)
   return (
-    <Box sx={{ width: '50%', minWidth:'300px', overflowY: 'hidden' }}>
+    <Box sx={{ width: '50%', minWidth: '300px', overflowY: 'hidden' }}>
       <ImageList variant={variant} cols={cols} gap={8}>
-        {itemData.map((item) => (
-          <ImageListItem key={item.img}>
+        {images.map((item, i) => (
+          <ImageListItem key={i}>
             <img
-              src={`${item.img}?w=248&fit=crop&auto=format`}
-              srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+              src={item.is_local ? item.file_base64 : item.url}
+              // srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
               alt={item.title}
               loading="lazy"
             />
