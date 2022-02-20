@@ -1,45 +1,84 @@
+// export function getTemplateModel() {
+//   return {
+//     welcomeWords: 'Hello welcome to our wedding',
+//     name1: 'Name 1',
+//     name2: 'Name 2',
+//     disableParent: false,
+//     parentA1: 'parent 1',
+//     parentA2: 'parent 2',
+//     parentB1: 'parent 3',
+//     parentB2: 'parent 4',
+//     mainDate: '2021-02-13T01:49:29+01:00',
+//     section1Title: 'Wedding Details',
+//     descriptionText1: 'Anak ke 1 dari Bapak Fulan & Ibu Fulanah',
+//     descriptionText2: 'Anak ke 3 dari Bapak Abdul & Ibu Abdul',
+//     userId: '',
+
+//     ppA: ImageBBObject(),
+//     ppB: ImageBBObject(),
+
+//     parseBgImage: ImageBBObject(),
+
+//     bgImage: ImageBBObject(),
+
+//     images: [ImageBBObject()],
+
+//     events: [{
+//       name: 'Event 1',
+//       place: 'Event 1 place',
+//       address: 'Event 1 Address, No. 17, Indonesia',
+//       startTime: '',
+//       endTime: '',
+//       date: '2021-02-13T01:49:29+01:00',
+//       mapLink: 'https://goo.gl/maps/CZ24HgifWh2vjYp8A'
+//     },
+//     {
+//       name: 'Event 2',
+//       place: 'Event 2 place',
+//       address: 'Event 2 Address, No. 17, Indonesia',
+//       startTime: '',
+//       endTime: '',
+//       date: '2021-02-13T01:49:29+01:00',
+//       mapLink: 'https://goo.gl/maps/CZ24HgifWh2vjYp8A'
+//     }
+//     ]
+//   }
+// }
+
 export function getTemplateModel() {
   return {
-    welcomeWords: 'Hello welcome to our wedding',
-    name1: 'Name 1',
-    name2: 'Name 2',
-    disableParent: false,
-    parentA1: 'parent 1',
-    parentA2: 'parent 2',
-    parentB1: 'parent 3',
-    parentB2: 'parent 4',
-    mainDate: '2021-02-13T01:49:29+01:00',
-    section1Title: 'Wedding Details',
-    descriptionText1: 'Anak ke 1 dari Bapak Fulan & Ibu Fulanah',
-    descriptionText2: 'Anak ke 3 dari Bapak Abdul & Ibu Abdul',
-    userId: '',
+    id: '',
+    welcome_words: 'Hello welcome to our wedding',
+    name_a: 'Name 1',
+    name_b: 'Name 2',
+    main_date: '2021-02-13T01:49:29+01:00',
+    section_1_title: 'Wedding Details',
+    description_text_a: 'Anak ke 1 dari Bapak Fulan & Ibu Fulanah',
+    description_text_b: 'Anak ke 3 dari Bapak Abdul & Ibu Abdul',
+    user_id: '',
 
-    ppA: ImageBBObject(),
-    ppB: ImageBBObject(),
-    
-    parseBgImage: ImageBBObject(),
-
-    bgImage: ImageBBObject(),
-
+    profile_pict_a: ImageBBObject(),
+    profile_pict_b: ImageBBObject(),
+    bg_image: ImageBBObject(),
     images: [ImageBBObject()],
 
     events: [{
       name: 'Event 1',
       place: 'Event 1 place',
       address: 'Event 1 Address, No. 17, Indonesia',
-      startTime: '',
-      endTime: '',
+      start_time: '',
+      end_time: '',
       date: '2021-02-13T01:49:29+01:00',
-      mapLink: 'https://goo.gl/maps/CZ24HgifWh2vjYp8A'
+      map_link: 'https://goo.gl/maps/CZ24HgifWh2vjYp8A'
     },
     {
       name: 'Event 2',
       place: 'Event 2 place',
       address: 'Event 2 Address, No. 17, Indonesia',
-      startTime: '',
-      endTime: '',
+      start_time: '',
+      end_time: '',
       date: '2021-02-13T01:49:29+01:00',
-      mapLink: 'https://goo.gl/maps/CZ24HgifWh2vjYp8A'
+      map_link: 'https://goo.gl/maps/CZ24HgifWh2vjYp8A'
     }
     ]
   }

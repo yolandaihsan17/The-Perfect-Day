@@ -5,7 +5,8 @@ import Parse from 'parse'
 import { useParams } from "react-router-dom";
 import Compressor from 'compressorjs';
 import axios from 'axios';
-// import img
+import { nanoid } from 'nanoid';
+import { getAuth } from "firebase/auth";
 
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
@@ -25,6 +26,11 @@ import EventForm from '../../../components/EventForm/EventForm';
 import { getTemplateModel, ImageBBObject } from '../../../model/wedding';
 import { getTemplateEvent } from '../../../model/event-template';
 import compressImage from '../../../utils/compress-image';
+import getWedding from '../../../utils/wedding-get-data';
+import saveToFirebase from '../../../utils/wedding-save-data';
+import OverlaySpinner from '../../../components/Spinner/Spinner';
+import uploadImage from '../../../utils/upload-image';
+import getUser from '../../../utils/get-logged-in-user';
 
 
 import './Template1.scss'
@@ -37,82 +43,59 @@ const Template1 = (props) => {
   // console.log({children})
   const { invId } = useParams();
   const isEditMode = props.editMode
-  const currentUser = Parse.User.current()
-  const [state, setState] = useState(getTemplateModel())
 
-  const bgImageFile = useRef()
-  const profilePictAFile = useRef()
-  const profilePictBFile = useRef()
+  const currentUser = useRef(getUser())
+
+  const [state, setState] = useState(getTemplateModel())
 
   const templateEvent = getTemplateEvent()
 
-  const [profilePictA, setProfilePictA] = useState(ImageBBObject())
-  const [profilePictB, setProfilePictB] = useState(ImageBBObject())
-  const [backgroundImage, setBackgroundImage] = useState(ImageBBObject())
-  const [imagesArray, setImagesArray] = useState([])
+  // const [profilePictA, setProfilePictA] = useState(ImageBBObject())
+  // const [profilePictB, setProfilePictB] = useState(ImageBBObject())
+  // const [backgroundImage, setBackgroundImage] = useState(ImageBBObject())
+  // const [imagesArray, setImagesArray] = useState([])
+
+  const bg_image_local = useRef(false)
+  const profile_pict_a_local = useRef(false)
+  const profile_pict_b_local = useRef(false)
+  const images_local = useRef(false)
+
+  const [showSpinner, setShowSpinner] = useState(false)
 
   // FORM functions
   const [open, setOpen] = useState(false);
   const [field, setField] = useState(<div>&nbsp;</div>)
 
+  //Getting data at first load
   useEffect(() => {
-    getInvitationData()
+    getWedding(invId).then(result => {
+      result.forEach((doc) => {
+        const data = doc.data()
+        setState({
+          ...data,
+          profile_pict_a: JSON.parse(data.profile_pict_a),
+          profile_pict_b: JSON.parse(data.profile_pict_b),
+          bg_image: JSON.parse(data.bg_image),
+          images: Object.values(JSON.parse(data.images)),
+        })
+      })
+    })
   }, [])
 
+  //if state already updated
   useEffect(() => {
-    // getInvitationData()
-    console.log(imagesArray)
-  }, [imagesArray])
+    checkData()
+  }, [state])
 
-  async function getInvitationData() {
-    const wedding = Parse.Object.extend('wedding');
-    const query = new Parse.Query(wedding);
-    query.equalTo('objectId', invId);
-    // You can also query by using a parameter of an object
-    // query.equalTo('objectId', 'xKue915KBG');
-    try {
-      const results = await query.find();
-      const userId = results[0].get('userId')
-      const isSameUser = checkUser(userId)
 
-      if (isSameUser) {
-        for (const object of results) {
-          setState({
-            welcomeWords: object.get('welcomeWords'),
-            name1: object.get('name1'),
-            name2: object.get('name2'),
-            mainDate: object.get('mainDate'),
-            section1Title: object.get('section1Title'),
-            descriptionText1: object.get('descriptionText1'),
-            descriptionText2: object.get('descriptionText2'),
-            // bgImage: object.get('bgImage'),
-            events: object.get('events'),
-            userId: object.get('userId'),
-            // ppA: object.get('profilePictA'),
-            // ppB: object.get('profilePictB'),
-            // images: object.get('images')
-          })
-
-          setProfilePictA(object.get('profilePictA'))
-          setProfilePictB(object.get('profilePictA'))
-          setBackgroundImage(object.get('bgImage'))
-          setImagesArray(object.get('images'))
-        }
-      } else {
-        console.log('redirecting')
-      }
-    } catch (error) {
-      console.error('Error while fetching wedding', error);
-    }
-  }
-
-  function checkUser(invitationUserId) {
-    if (currentUser.id !== invitationUserId) {
-      return false
+  function checkData() {
+    if (state.user_id === currentUser.current) {
+      console.log('same user')
     } else {
-      return true
+      console.log('different user')
     }
   }
+
   //IMAGE Zone
   function readImage(event) {
     let file = event.target.files[0];
@@ -127,24 +110,23 @@ const Template1 = (props) => {
     }
   }
 
-  // let bgImage = useRef({})
-
   function setBgImage(file) {
     const reader = new FileReader();
     const url = reader.readAsDataURL(file);
 
-    // bgImageFile.current = file
-
     reader.onloadend = (e) => {
       const image = reader.result
       const resetPict = ImageBBObject()
-      setBackgroundImage({ ...resetPict, is_local: true, file_base64: image, title: file.filename, file: file })
+      setState(prev => {
+        return {
+          ...prev,
+          bg_image: { ...resetPict, is_local: true, file_base64: image, title: file.filename, file: file }
+        }
+      })
+      bg_image_local.current = true
+      // setBackgroundImage({ ...resetPict, is_local: true, file_base64: image, title: file.filename, file: file })
     }
   }
-
-
-  // let profileA = useRef({}) //to upload to IMGBB, not base64
-  // let profileB = useRef({}) //to upload to IMGBB, not base64
 
   function changeAvatar(event, target) {
     const file = event.target.files[0];
@@ -155,10 +137,24 @@ const Template1 = (props) => {
       const image = reader.result
       if (target === 'a') {
         const resetPict = ImageBBObject()
-        setProfilePictA({ ...resetPict, is_local: true, file_base64: image, title: file.filename, file: file })
+        // setProfilePictA({ ...resetPict, is_local: true, file_base64: image, title: file.filename, file: file })
+        setState(prev => {
+          return {
+            ...prev,
+            profile_pict_a: { ...resetPict, is_local: true, file_base64: image, title: file.filename, file: file }
+          }
+        })
+        profile_pict_a_local.current = true
       } else {
         const resetPict = ImageBBObject()
-        setProfilePictB({ ...resetPict, is_local: true, file_base64: image, title: file.filename, file: file })
+        // setProfilePictB({ ...resetPict, is_local: true, file_base64: image, title: file.filename, file: file })
+        setState(prev => {
+          return {
+            ...prev,
+            profile_pict_b: { ...resetPict, is_local: true, file_base64: image, title: file.filename, file: file }
+          }
+        })
+        profile_pict_b_local.current = true
       }
     }
   }
@@ -187,7 +183,14 @@ const Template1 = (props) => {
 
         if (filesLoaded.current === files.length) {
           filesLoaded.current = 0
-          setImagesArray(filesArray)
+          images_local.current = true
+          // setImagesArray(filesArray)
+          setState(prev => {
+            return {
+              ...prev,
+              images: filesArray
+            }
+          })
         }
       }
     }
@@ -195,104 +198,71 @@ const Template1 = (props) => {
     filesNew.current = tempArray
   }
 
-  let uploadedImages = useRef([])
 
-  //PARSE FUNCTIONS
+  const uploadedImages = useRef([])
+  const uploadedProfilePictA = useRef({})
+  const uploadedProfilePictB = useRef({})
+  const uploadedBgImage = useRef({})
+
+  //UPLOADING
   async function save() {
 
-    //Upload Avatar
-    const avatarA = await uploadImage(profilePictA.file)
-    // profileA.current = avatarA.data
-    setProfilePictA(avatarA.data)
-    console.log('avatar a Uploaded', avatarA.data)
+    setShowSpinner(true)
 
-    const avatarB = await uploadImage(profilePictB.file)
-    // profileB.current = avatarB.data
-    setProfilePictB(avatarB.data)
-    console.log('avatar b Uploaded', avatarB.data)
+    if (profile_pict_a_local) {
+      //Upload Avatar
+      const avatarA = await uploadImage(state.profile_pict_a.file)
+      // profileA.current = avatarA.data
+      // setProfilePictA(avatarA.data)
+      uploadedProfilePictA.current = avatarA.data
+      console.log('avatar a Uploaded', avatarA.data)
+    }
 
-    const bgImg = await uploadImage(backgroundImage.file)
-    // bgImage.current = bgImg.data
-    setBackgroundImage(bgImg.data)
-    console.log('bg Image Uploaded', bgImg.data)
+    if (profile_pict_b_local) {
+      const avatarB = await uploadImage(state.profile_pict_a.file)
+      // profileB.current = avatarB.data
+      // setProfilePictB(avatarB.data)
+      uploadedProfilePictB.current = avatarB.data
+      console.log('avatar b Uploaded', avatarB.data)
+    }
 
+    if (bg_image_local) {
+      const bgImg = await uploadImage(state.bg_image.file)
+      // bgImage.current = bgImg.data
+      // setBackgroundImage(bgImg.data)
+      uploadedBgImage.current = bgImg.data
+      console.log('bg Image Uploaded', bgImg.data)
+    }
 
-    //Upload Images
-    let index = 0
-    let tempArray = []
-    for (let image of filesNew.current) {
-      const result = await uploadImage(image)
-      index++
-      tempArray.push(result.data)
+    if (images_local) {
+      //Upload Images
+      let index = 0
+      let tempArray = []
+      for (let image of filesNew.current) {
+        const result = await uploadImage(image)
+        index++
+        tempArray.push(result.data)
+        uploadedImages.current = tempArray
 
-      // if all images uploaded
-      if (index === filesNew.current.length) {
-        setImagesArray(tempArray)
-        saveToParse()
+        // if all images uploaded
+        if (index === filesNew.current.length) {
+          sendToFirebase()
+        }
       }
     }
   }
 
-  async function saveToParse() {
-    const wedding = new Parse.Object('wedding');
-    wedding.set('userId', Parse.User.current().id);
-    wedding.set('orderDate', new Date());
-    wedding.set('templateName', 'template1');
-    wedding.set('welcomeWords', state.welcomeWords);
-    wedding.set('name1', state.name1);
-    wedding.set('name2', state.name2);
-    wedding.set('descriptionText1', state.descriptionText1);
-    wedding.set('descriptionText2', state.descriptionText2);
-    wedding.set('section1Title', state.section1Title);
-    wedding.set('events', state.events);
-    wedding.set('mainDate', state.mainDate);
-    wedding.set('profilePictA', profilePictA);
-    wedding.set('profilePictB', profilePictB);
-    wedding.set('bgImage', backgroundImage);
-    wedding.set('images', imagesArray)
-    try {
-      const result = await wedding.save();
-      // Access the Parse Object attributes using the .GET method
-      console.log('order created', result);
-    } catch (error) {
-      console.error('Error while creating order: ', error);
-    }
-  }
-
-  async function uploadImage(image) {
-    let body = new FormData()
-    body.set('key', 'd829fc600a8959409d9e433b97f87f32')
-    body.append('image', image)
-
-    const a = await axios({
-      method: 'post',
-      url: 'https://api.imgbb.com/1/upload',
-      data: body
+  async function sendToFirebase() {
+    await saveToFirebase({
+      ...state,
+      id: nanoid(),
+      bg_image: JSON.stringify({ ...uploadedBgImage.current }),
+      profile_pict_a: JSON.stringify({ ...uploadedProfilePictA.current }),
+      profile_pict_b: JSON.stringify({ ...uploadedProfilePictB.current }),
+      images: JSON.stringify({ ...uploadedImages.current })
     })
 
-    return a.data
-  }
-
-
-  function deleteUploadedImage() {
-    return new Promise((resolve, reject) => {
-      let count = 0
-      for (let image of uploadedImages.current) {
-        axios({
-          method: 'post',
-          url: image.delete_url,
-          data: null
-        }).then(() => {
-          count += 1
-          if (count === uploadedImages.current.length) {
-            resolve()
-          }
-        }).catch(() => {
-          console.log('Failed to delete this image: ' + image.title)
-          reject()
-        })
-      }
-    })
+    setShowSpinner(false)
   }
 
   const handleClickOpen = (field, type = 'text') => {
@@ -333,7 +303,6 @@ const Template1 = (props) => {
   const eventChange = (index, event) => {
     const tempEvents = state.events
     tempEvents[index] = event
-    console.log(tempEvents)
 
     setState(prevState => {
       return {
@@ -354,13 +323,13 @@ const Template1 = (props) => {
     const tempEvents = state.events
     tempEvents.splice(index, 1)
     setState(prev => { return { ...prev, events: tempEvents } })
-    console.log(tempEvents)
   }
 
 
   return (
     <div>
-      <Stack gap={2} alignItems={'center'} justifyContent={'center'} direction={'column'} className='opening' sx={{ backgroundImage: `url(${backgroundImage.is_local ? backgroundImage.file_base64 : backgroundImage.url})` }}>
+      {showSpinner && <OverlaySpinner />}
+      <Stack gap={2} alignItems={'center'} justifyContent={'center'} direction={'column'} className='opening' sx={{ backgroundImage: `url(${state.bg_image.is_local ? state.bg_image.file_base64 : state.bg_image.url})` }}>
         <div className="vignette"></div>
 
         {isEditMode &&
@@ -375,25 +344,25 @@ const Template1 = (props) => {
         <Typography variant='body' className='text-white' style={{ zIndex: '2' }}>The Wedding Of</Typography>
         <Stack alignItems={'center'} justifyContent={'flex-end'} direction={'column'} className='names-container' gap={0}>
           <div className='item-container'>
-            <Typography variant='h2' className='rancho pointer' id="name1" >{state.name1}</Typography>
+            <Typography variant='h2' className='rancho pointer' id="name_a" >{state.name_a}</Typography>
             {isEditMode &&
-              <IconButton onClick={() => handleClickOpen('name1')} color='secondary' size='small' variant='contained' className='edit-button'>
+              <IconButton onClick={() => handleClickOpen('name_a')} color='secondary' size='small' variant='contained' className='edit-button'>
                 <EditIcon />
               </IconButton>
             }
           </div>
           <Typography variant='h1' className='rancho'>&</Typography>
           <div className='item-container'>
-            <Typography variant='h2' className='rancho pointer' id='name2'>{state.name2}</Typography>
+            <Typography variant='h2' className='rancho pointer' id='name_b'>{state.name_b}</Typography>
             {isEditMode &&
-              <IconButton onClick={() => handleClickOpen('name2')} color='secondary' size='small' variant='contained' className='edit-button'>
+              <IconButton onClick={() => handleClickOpen('name_b')} color='secondary' size='small' variant='contained' className='edit-button'>
                 <EditIcon />
               </IconButton>
             }
           </div>
         </Stack>
         <div className='item-container'>
-          <Typography variant='body' className='text-white' style={{ zIndex: '2' }} id='mainDate'>{moment(state.mainDate).format('dddd, DD MMMM YYYY')}</Typography>
+          <Typography variant='body' className='text-white' style={{ zIndex: '2' }} id='mainDate'>{moment(state.main_date).format('dddd, DD MMMM YYYY')}</Typography>
           {isEditMode &&
             <IconButton onClick={() => handleClickOpen('mainDate', 'date')} color='secondary' size='small' variant='contained' className='edit-button'>
               <EditIcon />
@@ -405,17 +374,17 @@ const Template1 = (props) => {
 
       <Stack gap={2} alignItems={'center'} justifyContent={'center'} direction={'column'} className='wedding-detail'>
         <div className='item-container'>
-          <Typography variant='h4' className='rancho'>{state.section1Title}</Typography>
+          <Typography variant='h4' className='rancho'>{state.section_1_title}</Typography>
           {isEditMode &&
-            <IconButton onClick={() => handleClickOpen('section1Title')} color='secondary' size='small' variant='contained' className='edit-button'>
+            <IconButton onClick={() => handleClickOpen('section_1_title')} color='secondary' size='small' variant='contained' className='edit-button'>
               <EditIcon />
             </IconButton>
           }
         </div>
         <div className='item-container'>
-          <Typography variant='body' className='align-center pointer' id="welcomeWords">{state.welcomeWords}</Typography>
+          <Typography variant='body' className='align-center pointer' id="welcome_words">{state.welcome_words}</Typography>
           {isEditMode &&
-            <IconButton onClick={() => handleClickOpen('welcomeWords')} color='secondary' size='small' variant='contained' className='edit-button'>
+            <IconButton onClick={() => handleClickOpen('welcome_words')} color='secondary' size='small' variant='contained' className='edit-button'>
               <EditIcon />
             </IconButton>
           }
@@ -423,7 +392,7 @@ const Template1 = (props) => {
 
         <Stack flexWrap={'wrap'} gap={6} alignItems={'center'} justifyContent={'space-evenly'} direction={'row'} sx={{ width: '100%', marginTop: '32px' }}>
           <Stack gap={1} alignItems={'center'} justifyContent={'center'} direction={'column'} className='person-container'>
-            <Avatar sx={{ width: 100, height: 100 }} alt={profilePictA.title} src={profilePictA.is_local ? profilePictA.file_base64 : profilePictA.url}></Avatar>
+            <Avatar sx={{ width: 100, height: 100 }} alt={state.profile_pict_a.title} src={state.profile_pict_a.is_local ? state.profile_pict_a.file_base64 : state.profile_pict_a.url}></Avatar>
             <label htmlFor="ppA">
               <Input accept="image/*" id="ppA" type="file" onChange={(e) => changeAvatar(e, 'a')} />
               <IconButton color="primary" variant="contained" aria-label="upload picture" component="span" style={{ fontSize: '2rem' }}>
@@ -431,17 +400,17 @@ const Template1 = (props) => {
               </IconButton>
             </label>
             <div className='item-container'>
-              <Typography variant='h3' className='rancho'>{state.name1}</Typography>
+              <Typography variant='h3' className='rancho'>{state.name_a}</Typography>
               {isEditMode &&
-                <IconButton onClick={() => handleClickOpen('name1')} color='secondary' size='small' variant='contained' className='edit-button'>
+                <IconButton onClick={() => handleClickOpen('name_a')} color='secondary' size='small' variant='contained' className='edit-button'>
                   <EditIcon />
                 </IconButton>
               }
             </div>
             <div className='item-container'>
-              <Typography variant='caption' className='pointer' id="descriptionText1">{state.descriptionText1}</Typography>
+              <Typography variant='caption' className='pointer' id="description_text_a">{state.description_text_a}</Typography>
               {isEditMode &&
-                <IconButton onClick={() => handleClickOpen('descriptionText1')} color='secondary' size='small' variant='contained' className='edit-button'>
+                <IconButton onClick={() => handleClickOpen('description_text_a')} color='secondary' size='small' variant='contained' className='edit-button'>
                   <EditIcon fontSize='1rem' />
                 </IconButton>
               }
@@ -449,7 +418,7 @@ const Template1 = (props) => {
           </Stack>
           <Typography variant='h2' className='person-container rancho' sx={{ textAlign: 'center' }}>&</Typography>
           <Stack gap={1} alignItems={'center'} justifyContent={'center'} direction={'column'} className='person-container'>
-            <Avatar sx={{ width: 100, height: 100 }} alt={profilePictB.title} src={profilePictB.is_local ? profilePictB.file_base64 : profilePictB.url}></Avatar>
+            <Avatar sx={{ width: 100, height: 100 }} alt={state.profile_pict_b.title} src={state.profile_pict_b.is_local ? state.profile_pict_b.file_base64 : state.profile_pict_b.url}></Avatar>
             <label htmlFor="ppB">
               <Input accept="image/*" id="ppB" type="file" onChange={(e) => changeAvatar(e, 'b')} />
               <IconButton color="primary" variant="contained" aria-label="upload picture" component="span" style={{ fontSize: '2rem' }}>
@@ -457,17 +426,17 @@ const Template1 = (props) => {
               </IconButton>
             </label>
             <div className='item-container'>
-              <Typography variant='h3' className='rancho'>{state.name2}</Typography>
+              <Typography variant='h3' className='rancho'>{state.name_b}</Typography>
               {isEditMode &&
-                <IconButton onClick={() => handleClickOpen('name2')} color='secondary' size='small' variant='contained' className='edit-button'>
+                <IconButton onClick={() => handleClickOpen('name_b')} color='secondary' size='small' variant='contained' className='edit-button'>
                   <EditIcon fontSize='1rem' />
                 </IconButton>
               }
             </div>
             <div className='item-container'>
-              <Typography variant='caption' className='pointer' id="descriptionText2" onClick={handleClickOpen}>{state.descriptionText2}</Typography>
+              <Typography variant='caption' className='pointer' id="description_text_b" onClick={handleClickOpen}>{state.description_text_b}</Typography>
               {isEditMode &&
-                <IconButton onClick={() => handleClickOpen('descriptionText2')} color='secondary' size='small' variant='contained' className='edit-button'>
+                <IconButton onClick={() => handleClickOpen('description_text_b')} color='secondary' size='small' variant='contained' className='edit-button'>
                   <EditIcon fontSize='1rem' />
                 </IconButton>
               }
@@ -480,7 +449,7 @@ const Template1 = (props) => {
             <Stack gap={2} alignItems={'center'} justifyContent={'center'} direction={'column'} className='schedule-container' key={i}>
               <Typography variant='h4' className='rancho'>{event.name}</Typography>
               <Typography variant='body' className='date'>{moment(event.date).format('dddd, DD MMMM YYYY')}</Typography>
-              <Typography variant='caption' className='date'>{event.startTime} - {event.endTime} WIB</Typography>
+              <Typography variant='caption' className='date'>{event.start_time} - {event.end_time} WIB</Typography>
               <Typography variant='body' className='place'>{event.place}</Typography>
               <Typography variant='body' className='address'>{event.address}</Typography>
               {isEditMode && <Stack direction={'row'} gap={2} alignItems={'center'} justifyContent={'center'}>
@@ -508,11 +477,14 @@ const Template1 = (props) => {
           </label>
         }
 
-        {imagesArray && <ImageList sx={{ margin: '32px auto' }} images={imagesArray} />}
+        {state.images && <ImageList sx={{ margin: '32px auto' }} images={state.images} />}
 
-        <Button onClick={save}>
-          Save
-        </Button>
+        {isEditMode &&
+          <Button onClick={save}>
+            Save
+          </Button>
+        }
+
 
         <Dialog open={open} onClose={handleClose} disableScrollLock >
           <DialogContent>

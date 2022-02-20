@@ -15,6 +15,8 @@ import Parse from 'parse'
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from "react-router-dom";
 
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+
 function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -33,6 +35,8 @@ export default function Login() {
     const [inProgress, setInProgress] = React.useState(false)
     const navigate = useNavigate();
 
+    const auth = getAuth();
+
     const handleSubmit = (event) => {
         setInProgress(true)
         event.preventDefault();
@@ -43,19 +47,36 @@ export default function Login() {
             password: data.get('password'),
         };
 
-            (async () => {
-                try {
-                    // Pass the username and password to logIn function
-                    let user = await Parse.User.logIn(userData.username, userData.password);
-                    // Do stuff after successful login
-                    console.log('Logged in user', user);
-                    setInProgress(false)
-                    navigate('/')
-                } catch (error) {
-                    console.error(error.message);
-                    setInProgress(false)
-                }
-            })();
+
+
+        signInWithEmailAndPassword(auth, userData.username, userData.password)
+            .then((userCredential) => {
+                // Signed in 
+                const user = userCredential.user;
+                console.log('Logged in user', user);
+                setInProgress(false)
+                navigate('/')
+                // ...
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorMessage)
+            });
+
+        // (async () => {
+        //     try {
+        //         // Pass the username and password to logIn function
+        //         let user = await Parse.User.logIn(userData.username, userData.password);
+        //         // Do stuff after successful login
+        //         console.log('Logged in user', user);
+        //         setInProgress(false)
+        //         navigate('/')
+        //     } catch (error) {
+        //         console.error(error.message);
+        //         setInProgress(false)
+        //     }
+        // })();
     };
 
     return (

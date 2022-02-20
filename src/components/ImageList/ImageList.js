@@ -10,7 +10,7 @@ export default function MasonryImageList(props) {
 
   const images = props.images
 
-  console.log('images', images)
+  // console.log('images', images)
   return (
     <Box sx={{ width: '50%', minWidth: '300px', overflowY: 'hidden' }}>
       <ImageList variant={variant} cols={cols} gap={8}>
