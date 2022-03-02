@@ -10,12 +10,16 @@ import { Box } from '@mui/material';
 import Hero from '../../components/Hero/Hero';
 import Parse from 'parse'
 
+import { getAuth, signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+
 
 const Home = (props) => {
+  const navigate = useNavigate()
 
   React.useEffect(() => {
     checkLogin()
-  },[])
+  }, [])
 
   function checkLogin() {
     const isLoggedIn = Parse.User.current()
@@ -23,9 +27,12 @@ const Home = (props) => {
   }
 
   function logOut() {
-    Parse.User.logOut().then(() => {
-      const currentUser = Parse.User.current();  // this will now be null
-      console.log(currentUser)
+    const auth = getAuth();
+    signOut(auth).then(() => {
+      // Sign-out successful.
+      navigate('/login')
+    }).catch((error) => {
+      // An error happened.
     });
   }
   return (

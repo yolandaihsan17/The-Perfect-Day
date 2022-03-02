@@ -14,7 +14,7 @@
   padding: 16px;
   margin-bottom: 32px;
   font-weight: bold;
-  color: white;
+  color: var(--white);
   text-shadow: 3px 5px 8px #141414c2;
   z-index: 2;
   text-align: center;
@@ -30,7 +30,7 @@
 }
 
 .wedding-detail {
-  background: white;
+  background: var(--white);
   margin: 32px 16px;
   padding: 0px 16px;
 }

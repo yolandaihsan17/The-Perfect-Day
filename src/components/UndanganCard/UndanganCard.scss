@@ -2,14 +2,21 @@
 
 .card {
     box-shadow: $shadow-medium;
-    width: 250px;
-    min-height: 500px;
     background-color: #ffffff;
-    border-radius: 20px;
+    width: 100%;
+    max-width: 320px;
+    min-width: 300px;
+    border-radius: 12px;
     position: relative;
+    min-height: 160px;
     cursor: pointer;
     overflow: hidden;
     transition: all 0.5s ease-in-out;
+
+    &.add {
+        outline: 4px dashed var(--primary);
+        margin-left: 8px;
+    }
 }
 
 .bg-image {
@@ -20,10 +27,19 @@
     height: 100%;
     object-fit: cover;
     // border-radius: 20px;
+    filter: blur(1px);
+    filter: brightness(60%);
     transition: all 0.3s ease-in-out;
 }
 
-.card:hover .bg-image{
-    filter: brightness(50%);
+.card:hover .bg-image {
+    filter: brightness(30%);
     transform: scale(1.1);
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--white);
+    font-size: 0.8rem;
 }

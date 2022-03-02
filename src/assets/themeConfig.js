@@ -5,7 +5,7 @@ import { createTheme } from '@mui/material/styles'
 const primary50 = '#bbd3cc'
 // const primary200 = '99bdb2'
 // const primary300 = '77a799'
-const primary400 = '#55917f'
+const primary400 = '#3bb0ba'
 // const primary500 = '447466'
 // const primary600 = '33574c'
 // const primary700 = '223a33'
@@ -76,7 +76,7 @@ export const themeconfig = createTheme({
       contrastText: 'white'
     },
     secondary: {
-      main: '#fff',
+      main: '#9c765d',
       contrastText: 'white'
     },
     error: {
@@ -277,9 +277,9 @@ export const themeconfig = createTheme({
       styleOverrides: {
         option: {
           padding: '16px',
-          '&.Mui-focused': {
-            backgroundColor: primary50
-          }
+          // '&.Mui-focused': {
+          //   backgroundColor: primary50
+          // }
         },
         listbox: {
           '&::-webkit-scrollbar': {

@@ -1,12 +1,8 @@
 import React from 'react'
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import moment from 'moment';
-import Parse from 'parse'
-import { useParams } from "react-router-dom";
-import Compressor from 'compressorjs';
-import axios from 'axios';
 import { nanoid } from 'nanoid';
-import { getAuth } from "firebase/auth";
+import { getAuth } from 'firebase/auth';
 
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
@@ -21,39 +17,30 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 
-import ImageList from '../../../components/ImageList/ImageList'
-import EventForm from '../../../components/EventForm/EventForm';
-import { getTemplateModel, ImageBBObject } from '../../../model/wedding';
-import { getTemplateEvent } from '../../../model/event-template';
-import compressImage from '../../../utils/compress-image';
-import getWedding from '../../../utils/wedding-get-data';
-import saveToFirebase from '../../../utils/wedding-save-data';
-import OverlaySpinner from '../../../components/Spinner/Spinner';
-import uploadImage from '../../../utils/upload-image';
-import getUser from '../../../utils/get-logged-in-user';
+import ImageList from '../../components/ImageList/ImageList'
+import EventForm from '../../components/EventForm/EventForm';
+import { getTemplateModel, ImageBBObject } from '../../model/wedding';
+import { getTemplateEvent } from '../../model/event-template';
+import compressImage from '../../utils/compress-image';
+import saveToFirebase from '../../utils/wedding-save-data';
+import OverlaySpinner from '../../components/Spinner/Spinner';
+import uploadImage from '../../utils/upload-image';
+import { useNavigate } from 'react-router-dom';
 
 
-import './Template1.scss'
+import './NewWedding.scss'
 
 const Input = styled('input')({
   display: 'none',
 });
 
-const Template1 = (props) => {
-  // console.log({children})
-  const { invId } = useParams();
-  const isEditMode = props.editMode
-
-  const currentUser = useRef(getUser())
+const NewWedding = (props) => {
+  const isEditMode = true
+  const navigate = useNavigate()
 
   const [state, setState] = useState(getTemplateModel())
 
   const templateEvent = getTemplateEvent()
-
-  // const [profilePictA, setProfilePictA] = useState(ImageBBObject())
-  // const [profilePictB, setProfilePictB] = useState(ImageBBObject())
-  // const [backgroundImage, setBackgroundImage] = useState(ImageBBObject())
-  // const [imagesArray, setImagesArray] = useState([])
 
   const bg_image_local = useRef(false)
   const profile_pict_a_local = useRef(false)
@@ -66,41 +53,11 @@ const Template1 = (props) => {
   const [open, setOpen] = useState(false);
   const [field, setField] = useState(<div>&nbsp;</div>)
 
-  //Getting data at first load
-  useEffect(() => {
-    getWedding(invId).then(result => {
-      result.forEach((doc) => {
-        const data = doc.data()
-        setState({
-          ...data,
-          profile_pict_a: JSON.parse(data.profile_pict_a),
-          profile_pict_b: JSON.parse(data.profile_pict_b),
-          bg_image: JSON.parse(data.bg_image),
-          images: Object.values(JSON.parse(data.images)),
-        })
-      })
-    })
-  }, [])
-
-  //if state already updated
-  useEffect(() => {
-    checkData()
-  }, [state])
-
-
-  function checkData() {
-    if (state.user_id === currentUser.current) {
-      console.log('same user')
-    } else {
-      console.log('different user')
-    }
-  }
-
   //IMAGE Zone
   function readImage(event) {
     let file = event.target.files[0];
-    // if more than 64MB, then compress it first
-    if (file.size > 5000000) {
+    // if more than 10MB, then compress it first
+    if (file.size > 10000000) {
       compressImage(file).then(result => {
         file = result
         setBgImage(file)
@@ -253,16 +210,21 @@ const Template1 = (props) => {
   }
 
   async function sendToFirebase() {
+
+    const auth = getAuth()
+    const user = auth.currentUser
+
     await saveToFirebase({
       ...state,
       id: nanoid(),
+      user_id: user.uid,
       bg_image: JSON.stringify({ ...uploadedBgImage.current }),
       profile_pict_a: JSON.stringify({ ...uploadedProfilePictA.current }),
       profile_pict_b: JSON.stringify({ ...uploadedProfilePictB.current }),
       images: JSON.stringify({ ...uploadedImages.current })
     })
-
     setShowSpinner(false)
+    navigate('/user-dashboard')
   }
 
   const handleClickOpen = (field, type = 'text') => {
@@ -332,15 +294,6 @@ const Template1 = (props) => {
       <Stack gap={2} alignItems={'center'} justifyContent={'center'} direction={'column'} className='opening' sx={{ backgroundImage: `url(${state.bg_image.is_local ? state.bg_image.file_base64 : state.bg_image.url})` }}>
         <div className="vignette"></div>
 
-        {isEditMode &&
-          <label htmlFor="icon-button-file" style={{ position: 'absolute', top: '20px', right: '20px' }}>
-            <Input accept="image/*" id="icon-button-file" type="file" onChange={readImage} />
-            <IconButton color="secondary" variant="contained" aria-label="upload picture" component="span" style={{ fontSize: '2rem' }}>
-              <PhotoCamera />
-            </IconButton>
-          </label>
-        }
-
         <Typography variant='body' className='text-white' style={{ zIndex: '2' }}>The Wedding Of</Typography>
         <Stack alignItems={'center'} justifyContent={'flex-end'} direction={'column'} className='names-container' gap={0}>
           <div className='item-container'>
@@ -369,6 +322,14 @@ const Template1 = (props) => {
             </IconButton>
           }
         </div>
+
+
+        {isEditMode &&
+          <label htmlFor="icon-button-file">
+            <Input accept="image/*" id="icon-button-file" type="file" onChange={readImage} />
+            <Button startIcon={<PhotoCamera />} sx={{ mt: 8 }} aria-label="upload picture" component="span">Ganti Foto Utama</Button>
+          </label>
+        }
 
       </Stack>
 
@@ -454,7 +415,7 @@ const Template1 = (props) => {
               <Typography variant='body' className='address'>{event.address}</Typography>
               {isEditMode && <Stack direction={'row'} gap={2} alignItems={'center'} justifyContent={'center'}>
                 <Button onClick={() => editEvent(i)}> Edit </Button>
-                <Button onClick={() => deleteEvent(i)}> Delete </Button>
+                <Button onClick={() => deleteEvent(i)}> Hapus </Button>
               </Stack>
               }
             </Stack>
@@ -464,7 +425,7 @@ const Template1 = (props) => {
 
         {isEditMode &&
           <Stack alignItems={'center'} justifyContent={'center'} direction={'column'} style={{ height: '100%' }}>
-            <Button onClick={addEvent}>Add Event</Button>
+            <Button onClick={addEvent}>Tambahkan Acara</Button>
           </Stack>
         }
 
@@ -481,7 +442,7 @@ const Template1 = (props) => {
 
         {isEditMode &&
           <Button onClick={save}>
-            Save
+            Simpan
           </Button>
         }
 
@@ -495,8 +456,8 @@ const Template1 = (props) => {
             {field}
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => handleClose('cancel')}>Cancel</Button>
-            <Button onClick={() => handleClose('submit')}>Save</Button>
+            <Button onClick={() => handleClose('cancel')}>Batal</Button>
+            <Button onClick={() => handleClose('submit')}>Simpan</Button>
           </DialogActions>
         </Dialog>
 
@@ -505,4 +466,4 @@ const Template1 = (props) => {
   )
 }
 
-export default Template1
+export default NewWedding

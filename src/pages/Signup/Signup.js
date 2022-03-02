@@ -14,6 +14,8 @@ import Container from '@mui/material/Container';
 import Parse from 'parse'
 import { CircularProgress } from '@mui/material';
 
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+
 function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -31,7 +33,8 @@ export default function Signup() {
 
     const [inProgress, setInProgress] = React.useState(false)
 
-    const handleSubmit = (event) => {
+
+    const handleSubmit = async (event) => {
         setInProgress(true)
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -44,38 +47,22 @@ export default function Signup() {
             password: data.get('password'),
         };
 
-        (async () => {
-            const user = new Parse.User();
-            user.set('username', userData.username);
-            user.set('email', userData.email);
-            user.set('lastName', userData.lastName);
-            user.set('firstName', userData.firstName);
-            user.set('password', userData.password);
+        const auth = getAuth();
+        console.log(auth)
+        await createUserWithEmailAndPassword(auth, userData.email, userData.password)
+            .then((userCredential) => {
+                // Signed in 
+                const user = userCredential.user;
+                console.log(user)
+                // ...
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // ..
+            });
 
-            try {
-                let userResult = await user.signUp();
-                console.log('User signed up', userResult);
-                login(userData)
-            } catch (error) {
-                console.error(error.message);
-                setInProgress(false)
-            }
-        })();
-    };
-
-    function login(userData) {
-        (async () => {
-            try {
-              // Pass the username and password to logIn function
-              let user = await Parse.User.logIn(userData.username,userData.password);
-              // Do stuff after successful login
-              console.log('Logged in user', user);
-              setInProgress(false)
-            } catch (error) {
-              console.error('Error while logging in user', error);
-              setInProgress(false)
-            }
-          })();
+        setInProgress(false)
     }
 
     return (
@@ -161,8 +148,9 @@ export default function Signup() {
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
+                        disabled={inProgress}
                     >
-                        {inProgress ? <CircularProgress color='warning' size={25}/> : "Sign Up" }
+                        {inProgress ? <CircularProgress color='warning' size={25} /> : "Sign Up"}
                     </Button>
                     <Grid container justifyContent="flex-end">
                         <Grid item>

@@ -6,6 +6,8 @@ export default function EventForm(props) {
   // const { name, place, address, startTime, endTime, date, mapLink } = props.state
   const propState = props.state
 
+console.log('heeyyy')
+
   console.log(props)
 
   const handleChange = (field, event) => {
@@ -21,7 +23,7 @@ export default function EventForm(props) {
         fullWidth
         placeholder={propState.name}
         variant="standard"
-        label='Event Name'
+        label='Nama Acara'
         onChange={(e) => handleChange('name', e)}
       />
       <TextField
@@ -29,7 +31,7 @@ export default function EventForm(props) {
         type="date"
         fullWidth
         variant="standard"
-        label='Date'
+        label='Tanggal'
         onChange={(e) => handleChange('date', e)}
       />
       <TextField
@@ -37,16 +39,16 @@ export default function EventForm(props) {
         type="time"
         fullWidth
         variant="standard"
-        label='Start Time'
-        onChange={(e) => handleChange('startTime', e)}
+        label='Jam Mulai'
+        onChange={(e) => handleChange('start_time', e)}
       />
       <TextField
         autoFocus
         type="time"
         fullWidth
         variant="standard"
-        label='End Time'
-        onChange={(e) => handleChange('endTime', e)}
+        label='Jam Berakhir'
+        onChange={(e) => handleChange('end_time', e)}
       />
       <TextField
         autoFocus
@@ -54,7 +56,7 @@ export default function EventForm(props) {
         fullWidth
         placeholder={propState.place}
         variant="standard"
-        label='Place (ex: Building Name)'
+        label='Tempat (contoh: Gedung Sate)'
         onChange={(e) => handleChange('place', e)}
       />
       <TextField
@@ -63,17 +65,17 @@ export default function EventForm(props) {
         fullWidth
         placeholder={propState.address}
         variant="standard"
-        label='Address'
+        label='Alamat'
         onChange={(e) => handleChange('address', e)}
       />
       <TextField
         autoFocus
         type="text"
         fullWidth
-        placeholder={propState.mapLink}
+        placeholder={propState.map_link}
         variant="standard"
-        label='Map Link (ex: google map link'
-        onChange={(e) => handleChange('mapLink', e)}
+        label='Link Google Map (ex: google map link'
+        onChange={(e) => handleChange('map_link', e)}
       />
     </>)
 }

@@ -37,25 +37,25 @@ export default function Login() {
 
     const auth = getAuth();
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         setInProgress(true)
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         // eslint-disable-next-line no-console
         const userData = {
-            username: data.get('username'),
+            email: data.get('email'),
             password: data.get('password'),
         };
 
 
 
-        signInWithEmailAndPassword(auth, userData.username, userData.password)
+        await signInWithEmailAndPassword(auth, userData.email, userData.password)
             .then((userCredential) => {
                 // Signed in 
                 const user = userCredential.user;
-                console.log('Logged in user', user);
+                // console.log('Logged in user', user);
                 setInProgress(false)
-                navigate('/')
+                navigate('/user-dashboard')
                 // ...
             })
             .catch((error) => {
@@ -63,6 +63,7 @@ export default function Login() {
                 const errorMessage = error.message;
                 console.log(errorMessage)
             });
+
 
         // (async () => {
         //     try {
@@ -102,10 +103,11 @@ export default function Login() {
                             margin="normal"
                             required
                             fullWidth
-                            id="username"
-                            label="Username"
-                            name="username"
-                            autoComplete="username"
+                            type='email'
+                            id="email"
+                            label="Email"
+                            name="email"
+                            autoComplete="email"
                             autoFocus
                         />
                         <TextField
@@ -127,6 +129,7 @@ export default function Login() {
                             fullWidth
                             variant="contained"
                             sx={{ mt: 3, mb: 2 }}
+                            disabled={inProgress}
                         >
                             {inProgress ? <CircularProgress color='warning' size={25} /> : "Login"}
                         </Button>
